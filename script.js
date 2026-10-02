@@ -12,9 +12,8 @@ const btnRealizadas = document.getElementById('filtro-realizadas');
 let tarefas = [];
 let filtro = 'todas';
 
-// Defina os caminhos das suas fotos aqui
 const fotoDia = "94b5306c-4cf9-4ab0-995b-0b148e70e644_Original (1).JPG";
-const fotoNoite = "6fca7b1b-2470-4f4e-a06e-9ce06b5b8f0b.jpg"; // Substitua pelo arquivo da foto para a noite, se tiver
+const fotoNoite = "6fca7b1b-2470-4f4e-a06e-9ce06b5b8f0b.jpg"; 
 
 function atualizar() {
     lista.innerHTML = '';
@@ -75,16 +74,15 @@ function excluir(id) {
 botaoAdicionar.addEventListener('click', adicionar);
 campo.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionar(); });
 
-// Alternar Tema e trocar a foto de perfil automaticamente
 botaoTema.addEventListener('click', () => {
     document.body.classList.toggle('modo-escuro');
     const icone = botaoTema.querySelector('i');
     
     if (document.body.classList.contains('modo-escuro')) {
         icone.className = 'fa-solid fa-sun';
-        fotoPerfil.src = fotoNoite; // Muda para a foto da noite
+        fotoPerfil.src = fotoNoite; 
     } else {
         icone.className = 'fa-solid fa-moon';
-        fotoPerfil.src = fotoDia; // Volta para a foto do dia
+        fotoPerfil.src = fotoDia; 
     }
 });
