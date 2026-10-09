@@ -1,153 +1,152 @@
-:root {
-    --bg: #ffeb3b; 
-    --card: #ffffff;
-    --texto: #000000;
-    --cinza: #777777;
-    --borda: #000000;
-}
-
-body.modo-escuro {
-    --bg: #000000; 
-    --card: #111111;
-    --texto: #ffffff;
-    --cinza: #aaaaaa;
-    --borda: #070707;
-}
-
 body {
-    background: var(--bg);
-    color: var(--texto);
     font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
 }
 
-.cartao {
-    background: var(--card);
-    border: 3px solid var(--borda);
+.container {
+    background: #fff;
     padding: 20px;
-    width: 380px;
-    border-radius: 12px;
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
 }
 
 header h1 {
-    font-size: 1.3rem;
-}
-
-header h1 i {
-    color: #ffc107; 
-}
-
-.container-foto {
+    font-size: 22px;
+    color: #00539F;
     display: flex;
-    justify-content: center;
-    margin-bottom: 15px;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0;
 }
 
-.foto-perfil {
-    width: 60px;
-    height: 60px;
+.profile-img {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.profile-img img {
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    border: 2px solid var(--borda);
     object-fit: cover;
+    border: 2px solid #00539F;
 }
 
-.caixa-entrada {
+.form-group {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 15px;
 }
 
-.caixa-entrada input {
+input[type="text"] {
     flex: 1;
     padding: 8px;
-    border: 2px solid var(--borda);
-    border-radius: 6px;
-    background: var(--card);
-    color: var(--texto);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+}
+
+input[type="text"]:focus {
+    border-color: #00539F;
 }
 
 button {
-    cursor: pointer;
-    border: 2px solid var(--borda);
-    background: var(--card);
-    color: var(--texto);
     padding: 8px 12px;
-    border-radius: 6px;
-    font-weight: bold;
+    background-color: #00539F;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 button:hover {
-    background: var(--borda);
-    color: var(--card);
-}
-
-.filtros {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 15px;
-}
-
-.filtros button {
-    flex: 1;
-    font-size: 0.8rem;
-    padding: 6px;
-}
-
-.filtros button.ativo {
-    background: var(--borda);
-    color: var(--card);
+    background-color: #003d73;
 }
 
 ul {
     list-style: none;
     padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 15px;
+    margin: 0;
 }
 
-li {
+ul li {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 8px;
-    border: 1px solid var(--borda);
-    margin-bottom: 6px;
-    border-radius: 6px;
+    border-bottom: 1px solid #eee;
 }
 
-li.realizada span {
+ul li.completed span {
     text-decoration: line-through;
-    color: var(--cinza);
+    color: #888;
 }
 
-.texto-tarefa {
-    cursor: pointer;
-    flex: 1;
+ul li button {
+    background-color: #d9534f;
+    padding: 4px 8px;
+    font-size: 12px;
 }
 
-.botao-excluir {
-    background: none;
-    border: none;
-    color: #ff3d00;
-    font-size: 1rem;
+ul li button:hover {
+    background-color: #c9302c;
 }
 
 footer {
-    font-size: 0.85rem;
-    color: var(--cinza);
+    margin-top: 15px;
+    text-align: right;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Estilos do Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    position: relative;
     text-align: center;
-    border-top: 1px solid var(--borda);
-    padding-top: 10px;
+}
+
+.modal-content ul {
+    text-align: left;
+    font-size: 13px;
+    margin-bottom: 15px;
+    padding-left: 15px;
+}
+
+.close {
+    color: #aaa;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
 }
