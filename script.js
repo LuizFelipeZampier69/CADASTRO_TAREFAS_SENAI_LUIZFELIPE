@@ -1,88 +1,128 @@
-const campo = document.getElementById('campo-tarefa');
-const botaoAdicionar = document.getElementById('botao-adicionar');
-const lista = document.getElementById('lista-tarefas');
-const contador = document.getElementById('contador');
-const botaoTema = document.getElementById('botao-tema');
-const fotoPerfil = document.getElementById('foto-perfil');
+const STORAGE_KEY = 'senai_minhas_tarefas';
 
-const btnTodas = document.getElementById('filtro-todas');
-const btnPendentes = document.getElementById('filtro-pendentes');
-const btnRealizadas = document.getElementById('filtro-realizadas');
+// Carregar as tarefas salvas assim que a página abrir
+document.addEventListener('DOMContentLoaded', carregarTarefas);
 
-let tarefas = [];
-let filtro = 'todas';
+function carregarTarefas() {
+    const tarefas = obterTarefasDoStorage();
+    renderizarTarefas(tarefas);
+}
 
-const fotoDia = "94b5306c-4cf9-4ab0-995b-0b148e70e644_Original (1).JPG";
-const fotoNoite = "6fca7b1b-2470-4f4e-a06e-9ce06b5b8f0b.jpg"; 
+function obterTarefasDoStorage() {
+    const dados = localStorage.getItem(STORAGE_KEY);
+    return dados ? JSON.parse(dados) : [];
+}
 
-function atualizar() {
-    lista.innerHTML = '';
+function salvarTarefasNoStorage(tarefas) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tarefas));
+}
+
+function adicionarTarefa() {
+    const input = document.getElementById('taskInput');
+    const texto = input.value.trim();
+
+    if (texto === "") {
+        alert("Digite uma tarefa válida!");
+        return;
+    }
+
+    const tarefas = obterTarefasDoStorage();
     
-    let filtradas = tarefas.filter(t => {
-        if (filtro === 'pendentes') return !t.realizada;
-        if (filtro === 'realizadas') return t.realizada;
-        return true;
-    });
+    const novaTarefa = {
+        id: Date.now(),
+        texto: texto,
+        concluida: false
+    };
 
-    filtradas.forEach(t => {
+    tarefas.push(novaTarefa);
+    salvarTarefasNoStorage(tarefas);
+
+    input.value = "";
+    renderizarTarefas(tarefas);
+}
+
+function alternarTarefa(id) {
+    const tarefas = obterTarefasDoStorage();
+    const tarefa = tarefas.find(t => t.id === id);
+    if (tarefa) {
+        tarefa.concluida = !tarefa.concluida;
+        salvarTarefasNoStorage(tarefas);
+        renderizarTarefas(tarefas);
+    }
+}
+
+function excluirTarefa(id) {
+    let tarefas = obterTarefasDoStorage();
+    tarefas = tarefas.filter(t => t.id !== id);
+    salvarTarefasNoStorage(tarefas);
+    renderizarTarefas(tarefas);
+}
+
+function renderizarTarefas(tarefas) {
+    const lista = document.getElementById('taskList');
+    const contador = document.getElementById('taskCounter');
+    
+    lista.innerHTML = '';
+
+    tarefas.forEach(tarefa => {
         const li = document.createElement('li');
-        if (t.realizada) li.classList.add('realizada');
+        if (tarefa.concluida) {
+            li.classList.add('completed');
+        }
 
-        li.innerHTML = `
-            <span class="texto-tarefa" onclick="alternar(${t.id})">
-                <i class="fa-regular ${t.realizada ? 'fa-square-check' : 'fa-square'}"></i> 
-                ${t.texto}
-            </span>
-            <button class="botao-excluir" onclick="excluir(${t.id})"><i class="fa-solid fa-trash"></i></button>
-        `;
+        const span = document.createElement('span');
+        span.textContent = tarefa.texto;
+        span.style.cursor = 'pointer';
+        span.onclick = () => alternarTarefa(tarefa.id);
+
+        const btnRemover = document.createElement('button');
+        btnRemover.textContent = 'X';
+        btnRemover.onclick = () => excluirTarefa(tarefa.id);
+
+        li.appendChild(span);
+        li.appendChild(btnRemover);
         lista.appendChild(li);
     });
 
-    const pendentes = tarefas.filter(t => !t.realizada).length;
-    contador.textContent = `${pendentes} tarefas pendentes`;
+    const total = tarefas.length;
+    contador.textContent = `${total} ${total === 1 ? 'tarefa' : 'tarefas'}`;
 }
 
-function adicionar() {
-    if (campo.value.trim() === '') return;
-    tarefas.push({ id: Date.now(), texto: campo.value, realizada: false });
-    campo.value = '';
-    atualizar();
-}
-
-function alternar(id) {
-    tarefas = tarefas.map(t => t.id === id ? { ...t, realizada: !t.realizada } : t);
-    atualizar();
-}
-
-function excluir(id) {
-    tarefas = tarefas.filter(t => t.id !== id);
-    atualizar();
-}
-
-// Filtros
-[btnTodas, btnPendentes, btnRealizadas].forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.filtros button').forEach(b => b.classList.remove('ativo'));
-        e.target.classList.add('ativo');
-        if (e.target === btnTodas) filtro = 'todas';
-        if (e.target === btnPendentes) filtro = 'pendentes';
-        if (e.target === btnRealizadas) filtro = 'realizadas';
-        atualizar();
-    });
-});
-
-botaoAdicionar.addEventListener('click', adicionar);
-campo.addEventListener('keypress', (e) => { if (e.key === 'Enter') adicionar(); });
-
-botaoTema.addEventListener('click', () => {
-    document.body.classList.toggle('modo-escuro');
-    const icone = botaoTema.querySelector('i');
+// Funções do Modal / Banco de Dados
+function abrirModal() {
+    const modal = document.getElementById('infoModal');
+    const jsonBox = document.getElementById('jsonDatabase');
     
-    if (document.body.classList.contains('modo-escuro')) {
-        icone.className = 'fa-solid fa-sun';
-        fotoPerfil.src = fotoNoite; 
-    } else {
-        icone.className = 'fa-solid fa-moon';
-        fotoPerfil.src = fotoDia; 
+    // Mostra o JSON bruto armazenado no localStorage
+    const dadosBrutos = localStorage.getItem(STORAGE_KEY) || '[]';
+    jsonBox.textContent = JSON.stringify(JSON.parse(dadosBrutos), null, 2);
+    
+    modal.style.display = 'flex';
+}
+
+function fecharModal() {
+    document.getElementById('infoModal').style.display = 'none';
+}
+
+function limparBancoDeDados() {
+    if (confirm("Deseja apagar todas as tarefas salvas no banco de dados?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        carregarTarefas();
+        fecharModal();
+    }
+}
+
+// Fechar modal clicando fora dele
+window.onclick = function(event) {
+    const modal = document.getElementById('infoModal');
+    if (event.target === modal) {
+        fecharModal();
+    }
+}
+
+// Permite adicionar a tarefa apertando a tecla 'Enter'
+document.getElementById('taskInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        adicionarTarefa();
     }
 });
