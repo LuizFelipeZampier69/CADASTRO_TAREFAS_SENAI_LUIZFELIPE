@@ -3,39 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Painel de Tarefas</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Minhas Tarefas - SENAI</title>
+    <!-- Mantenha seus arquivos CSS originais aqui ou ajuste conforme seu estilo -->
+    <style>
+        /* Estilos básicos para demonstrar a estrutura original funcional */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        header h1 {
+            font-size: 22px;
+            color: #00539F;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .profile-img {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .profile-img img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00539F;
+        }
+        .form-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 12px;
+            background-color: #00539F;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #003d73;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        ul li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        ul li.completed span {
+            text-decoration: line-through;
+            color: #888;
+        }
+        ul li button {
+            background-color: #d9534f;
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        ul li button:hover {
+            background-color: #c9302c;
+        }
+        footer {
+            margin-top: 15px;
+            text-align: right;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-    <div class="cartao">
+
+    <div class="container">
         <header>
-            <h1>Minhas Tarefas <i class="fa-solid fa-star"></i></h1>
-            <button id="botao-tema"><i class="fa-solid fa-moon"></i></button>
+            <h1>Minhas Tarefas <i></i></h1>
         </header>
 
-        <div class="container-foto">
-            <img src="94b5306c-4cf9-4ab0-995b-0b148e70e644_Original (1).JPG" alt="Minha Foto" id="foto-perfil" class="foto-perfil">
+        <div class="profile-img">
+            <img alt="Minha Foto" src="94b5306c-4cf9-4ab0-995b-0b148e70e644_Original (1).JPG" onerror="this.src='https://via.placeholder.com/80'">
         </div>
 
-        <div class="caixa-entrada">
-            <input type="text" id="campo-tarefa" placeholder="O que vamos fazer hoje?..." maxlength="40">
-            <button id="botao-adicionar"><i class="fa-solid fa-plus"></i> Adicionar</button>
+        <!-- Formulário para adicionar tarefas (ajuste IDs se necessário de acordo com o seu original) -->
+        <div class="form-group">
+            <input type="text" id="taskInput" placeholder="Digite uma nova tarefa...">
+            <button id="addTaskBtn" onclick="adicionarTarefa()">Adicionar</button>
         </div>
 
-        <div class="filtros">
-            <button id="filtro-todas" class="ativo">Todas</button>
-            <button id="filtro-pendentes">Pendentes</button>
-            <button id="filtro-realizadas">Realizadas</button>
-        </div>
-
-        <ul id="lista-tarefas"></ul>
+        <!-- Lista onde as tarefas são renderizadas -->
+        <ul id="taskList"></ul>
 
         <footer>
-            <span id="contador">0 tarefas</span>
+            <span id="taskCounter">0 tarefas</span>
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Chave para salvar no localStorage do navegador
+        const STORAGE_KEY = 'senai_minhas_tarefas';
+
+        // Carregar as tarefas salvas assim que a página abrir
+        document.addEventListener('DOMContentLoaded', carregarTarefas);
+
+        function carregarTarefas() {
+            const tarefas = obterTarefasDoStorage();
+            renderizarTarefas(tarefas);
+        }
+
+        function obterTarefasDoStorage() {
+            const dados = localStorage.getItem(STORAGE_KEY);
+            return dados ? JSON.parse(dados) : [];
+        }
+
+        function salvarTarefasNoStorage(tarefas) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tarefas));
+        }
+
+        function adicionarTarefa() {
+            const input = document.getElementById('taskInput');
+            const texto = input.value.trim();
+
+            if (texto === "") {
+                alert("Digite uma tarefa válida!");
+                return;
+            }
+
+            const tarefas = obterTarefasDoStorage();
+            
+            // Cria o objeto da nova tarefa
+            const novaTarefa = {
+                id: Date.now(),
+                texto: texto,
+                concluida: false
+            };
+
+            tarefas.push(novaTarefa);
+            salvarTarefasNoStorage(tarefas);
+
+            input.value = "";
+            renderizarTarefas(tarefas);
+        }
+
+        function alternarTarefa(id) {
+            const tarefas = obterTarefasDoStorage();
+            const tarefa = tarefas.find(t => t.id === id);
+            if (tarefa) {
+                tarefa.concluida = !tarefa.concluida;
+                salvarTarefasNoStorage(tarefas);
+                renderizarTarefas(tarefas);
+            }
+        }
+
+        function excluirTarefa(id) {
+            let tarefas = obterTarefasDoStorage();
+            tarefas = tarefas.filter(t => t.id !== id);
+            salvarTarefasNoStorage(tarefas);
+            renderizarTarefas(tarefas);
+        }
+
+        function renderizarTarefas(tarefas) {
+            const lista = document.getElementById('taskList');
+            const contador = document.getElementById('taskCounter');
+            
+            lista.innerHTML = '';
+
+            tarefas.forEach(tarefa => {
+                const li = document.createElement('li');
+                if (tarefa.concluida) {
+                    li.classList.add('completed');
+                }
+
+                // Clicar no texto alterna o status de concluído
+                const span = document.createElement('span');
+                span.textContent = tarefa.texto;
+                span.style.cursor = 'pointer';
+                span.onclick = () => alternarTarefa(tarefa.id);
+
+                // Botão de remover
+                const btnRemover = document.createElement('button');
+                btnRemover.textContent = 'X';
+                btnRemover.onclick = () => excluirTarefa(tarefa.id);
+
+                li.appendChild(span);
+                li.appendChild(btnRemover);
+                lista.appendChild(li);
+            });
+
+            // Atualiza o rodapé com a quantidade de tarefas
+            const total = tarefas.length;
+            contador.textContent = `${total} ${total === 1 ? 'tarefa' : 'tarefas'}`;
+        }
+
+        // Permite adicionar a tarefa apertando a tecla 'Enter'
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adicionarTarefa();
+            }
+        });
+    </script>
 </body>
 </html>
